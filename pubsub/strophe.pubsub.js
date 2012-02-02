@@ -92,7 +92,9 @@ Strophe.Builder.prototype.children = function (object) {
 // TODO Ideas Adding possible conf values?
 /* Extend Strophe.Connection to have member 'pubsub'.
  */
-Strophe.addConnectionPlugin('pubsub', {
+
+var pubsub = {
+// Strophe.addConnectionPlugin('pubsub', {
 /*
 Extend connection object to have plugin name 'pubsub'.
 */
@@ -103,7 +105,6 @@ Extend connection object to have plugin name 'pubsub'.
 
     //The plugin must have the init function.
     init: function(conn) {
-
         this._connection = conn;
 
         /*
@@ -550,4 +551,8 @@ Extend connection object to have plugin name 'pubsub'.
         return this.publish(node, entries, call_back);
     },
 
-});
+};//);
+
+var Strophe = Strophe || {};
+Strophe.pubsub = function () {};
+Strophe.pubsub.prototype = pubsub;
