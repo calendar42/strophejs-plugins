@@ -237,11 +237,15 @@ Extend connection object to have plugin name 'pubsub'.
      *   (Function) error - Used to determine if node
      * creation had errors.
      */
-    discoverNodes: function(success, error, timeout) {
-
+    discoverNodes: function(node, success, error, timeout) {
+        if (!node) {
         //ask for all nodes
-        var iq = $iq({from:this.jid, to:this.service, type:'get'})
-          .c('query', { xmlns:Strophe.NS.DISCO_ITEMS });
+          var iq = $iq({from:this.jid, to:this.service, type:'get'})
+            .c('query', { xmlns:Strophe.NS.DISCO_ITEMS });
+        } else {
+          var iq = $iq({from:this.jid, to:this.service, type:'get'})
+            .c('query', { xmlns:Strophe.NS.DISCO_ITEMS, node:node });
+        }
 
         return this._connection.sendIQ(iq.tree(),success, error, timeout);
     },
