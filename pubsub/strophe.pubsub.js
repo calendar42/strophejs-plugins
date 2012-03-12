@@ -243,7 +243,8 @@ Extend connection object to have plugin name 'pubsub'.
      *    Iq id
      */
      discoverNodes: function(node, success, error, timeout, iqid) {
-         var _iqid = iqid ? iqid : this.getUniqueId("pubsubdisconode");
+         var that = this._connection;
+         var _iqid = iqid ? iqid : that.getUniqueId("pubsubdisconode");
 
          var iq = $iq({from:this.jid, to:this.service, type:'get', id: _iqid });
 
@@ -413,7 +414,8 @@ Extend connection object to have plugin name 'pubsub'.
     *    Iq id
     */
     items: function(node, success, error, timeout, iqid) {
-        var _iqid = iqid ? iqid : this.getUniqueId("pubsubitems");
+        var that = this._connection;
+        var _iqid = iqid ? iqid : that.getUniqueId("pubsubitems");
 
         //ask for all items
         var iq = $iq({from:this.jid, to:this.service, type:'get', id:_iqid})
@@ -443,7 +445,7 @@ Extend connection object to have plugin name 'pubsub'.
      */
     getSubscriptions: function(success, error, timeout, iqid) {
         var that = this._connection;
-        var _iqid = iqid ? iqid : this.getUniqueId("pubsubsubscriptions");
+        var _iqid = iqid ? iqid : that.getUniqueId("pubsubsubscriptions");
 
         var iq = $iq({from:this.jid, to:this.service, type:'get', id:_iqid})
           .c('pubsub', {'xmlns':Strophe.NS.PUBSUB})
@@ -470,7 +472,7 @@ Extend connection object to have plugin name 'pubsub'.
      */
     getNodeSubscriptions: function(node, success, error, timeout, iqid) {
         var that = this._connection;
-        var _iqid = iqid ? iqid : this.getUniqueId("pubsubsubscriptions");
+        var _iqid = iqid ? iqid : that.getUniqueId("pubsubsubscriptions");
 
         var iq = $iq({from:this.jid, to:this.service, type:'get', id:_iqid})
          .c('pubsub', {'xmlns':Strophe.NS.PUBSUB_OWNER})
@@ -495,7 +497,7 @@ Extend connection object to have plugin name 'pubsub'.
      */
     getSubOptions: function(node, subid, success, error, timeout, iqid) {
         var that = this._connection;
-        var _iqid = iqid ? iqid : this.getUniqueId("pubsubsuboptions");
+        var _iqid = iqid ? iqid : that.getUniqueId("pubsubsuboptions");
 
         var iq = $iq({from:this.jid, to:this.service, type:'get', id:_iqid})
           .c('pubsub', {xmlns:Strophe.NS.PUBSUB})
@@ -527,7 +529,7 @@ Extend connection object to have plugin name 'pubsub'.
      */
     getAffiliations: function(node, success, error, timeout, iqid) {
         var that = this._connection;
-        var _iqid = iqid ? iqid : this.getUniqueId("pubsubaffiliations");
+        var _iqid = iqid ? iqid : that.getUniqueId("pubsubaffiliations");
 
         if (typeof node === 'function') {
             call_back = node;
@@ -564,7 +566,7 @@ Extend connection object to have plugin name 'pubsub'.
      */
     setAffiliation: function(node, jid, affiliation, success, error, timeout, iqid) {
         var that = this._connection;
-        var _iqid = iqid ? iqid : this.getUniqueId("pubsubaffiliations");
+        var _iqid = iqid ? iqid : that.getUniqueId("pubsubaffiliations");
 
         var iq = $iq({from:this.jid, to:this.service, type:'set', id:_iqid})
           .c('pubsub', {'xmlns':Strophe.NS.PUBSUB_OWNER})
