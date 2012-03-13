@@ -341,7 +341,9 @@ Extend connection object to have plugin name 'pubsub'.
         }
 
         //add the event handler to receive items
-        that.addHandler(event_cb, null, 'message', null, null, null);
+        if (event_cb && typeof event_cb === 'function') {
+            that.addHandler(event_cb, null, 'message', null, null, null);
+        }
 
         return this._connection.sendIQ(iq.tree(), success, error, timeout);
     },
