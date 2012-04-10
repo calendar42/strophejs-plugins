@@ -27,6 +27,7 @@ Strophe.addConnectionPlugin('geoloc', {
      *    (String) accuracy   - The jid you want to send the iq to.
      *    (String) lat        - The jid you want to send the iq to.
      *    (String) lon        - The jid you want to send the iq to.
+     *    (String) timestamp  - timestamp of when the location was requested
      *    (String) locality   - The jid you want to send the iq to.
      *    (String) country    - The jid you want to send the iq to.
      *    (Function) success  - callback function for successful node creation.
@@ -34,14 +35,14 @@ Strophe.addConnectionPlugin('geoloc', {
      *    (Number) timeout    - Timeout in ms.
      *    (String) iqid         - Iq id.
 	 */
-	publishGeoloc: function(node, to, accuracy, lat, lon, locality, country, success, error, timeout, iqid)
+	publishGeoloc: function(node, to, accuracy, lat, lon, timestamp, locality, country, success, error, timeout, iqid)
 	{
         var _iqid = iqid ? iqid : this._c.getUniqueId('publishgeoloc');
 		var iq = $iq({type: 'set', to: to, id: _iqid}).
             c('pubsub', { xmlns:Strophe.NS.PUBSUB }).
-                c('publish', { xmlns: Strophe.NS.GEOLOC, node: node }).
+                c('publish', { node: node }).
                     c('item').
-                        c('geoloc');
+                        c('geoloc', { xmlns: Strophe.NS.GEOLOC });
         if (accuracy) {
             iq.c('accuracy').t(accuracy).up();
         }
@@ -50,6 +51,9 @@ Strophe.addConnectionPlugin('geoloc', {
         }
         if (lon) {
             iq.c('lon').t(lon).up();
+        }
+        if (timestamp) {
+            iq.c('timestamp').t(timestamp).up();
         }
         if (locality) {
             iq.c('locality').t(locality).up();
