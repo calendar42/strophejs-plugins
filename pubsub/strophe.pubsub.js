@@ -450,6 +450,20 @@ Extend connection object to have plugin name 'pubsub'.
         return this._connection.sendIQ(iq.tree(), success, error, timeout);
     },
 
+    /*Function: item
+    Used to retrieve a specific persistent item from a pubsub node.
+
+    */
+    item: function(node, id, success, error, timeout) {
+        //ask for specific item
+        var iq = $iq({from:this.jid, to:this.service, type:'get'})
+          .c('pubsub', { xmlns:Strophe.NS.PUBSUB })
+          .c('items', {node:node})
+          .c('item', {id:id});
+
+        return this._connection.sendIQ(iq.tree(), success, error, timeout);
+    },
+
     /** Function: getSubscriptions
      *  Get subscriptions of a JID.
      *
