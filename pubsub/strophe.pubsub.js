@@ -376,6 +376,29 @@ Extend connection object to have plugin name 'pubsub'.
     },
 
     /***Function
+    *   retract from a node or item.
+    *
+    * Parameters:
+    *    (String) node       - The name of the pubsub node.
+    *    (Function) success  - callback function for successful node creation.
+    *    (Function) error    - error callback function.
+    *    (Number) timeout    - Timeout in ms.
+    *    (String) iqid         - Iq id.
+
+    */
+    retract: function(node, id, success, error, timeout, iqid) {
+        var that = this._connection;
+        var _iqid = iqid ? iqid : that.getUniqueId("pubsubunsubscribenode");
+            
+        var iq = $iq({from:this.jid, to:this.service, type:'set', id:_iqid})
+          .c('pubsub', { xmlns:Strophe.NS.PUBSUB })
+          .c('retract', {'node':node})
+          .c('item', {'id':id});
+
+        return that.sendIQ(iq.tree(), success, error, timeout);
+    },
+
+    /***Function
     *
     * Publish and item to the given pubsub node.
     *
