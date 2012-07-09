@@ -550,6 +550,38 @@ Extend connection object to have plugin name 'pubsub'.
         return this._connection.sendIQ(iq.tree(), success, error, timeout);
     },
 
+    /** Function: setNodeSubscriptions
+     *  Set node subscriptions for provided list.
+     *
+     *  http://xmpp.org/extensions/tmp/xep-0060-1.13.html
+     *  8.8.2 Modify Subscriptions
+     *
+     * Parameters:
+     *    (String) node -  The name of the pubsub node.
+     *    (Array) subscriptions -  List of objects with jid and subscription
+     *    (Function) success - Called on success server response.
+     *    (Function) error - Called on error server response.
+     *    (Number) timeout - Called on error server response.
+     *    (String) iqid - Optional used as iq-id
+     *
+     *  Returns:
+     *    Iq id
+     */
+    setNodeSubscriptions: function(node, subscriptions, success, error, timeout, iqid) {
+        var that = this._connection;
+        var _iqid = iqid ? iqid : that.getUniqueId("pubsubsubscriptions");
+
+        var iq = $iq({from:this.jid, to:this.service, type:'set', id:_iqid})
+         .c('pubsub', {'xmlns':Strophe.NS.PUBSUB_OWNER})
+         .c('subscriptions', {'node':node });
+
+         for (var i = 0; i < subscriptions.length; i++) {
+          iq.c('subscription', {'jid': subscriptions[i].jid, 'subscription': subscriptions[i].subscription}).up();
+         }
+
+
+        return this._connection.sendIQ(iq.tree(), success, error, timeout);
+    },
     /** Function: getSubOptions
      *  Get subscription options form.
      *
