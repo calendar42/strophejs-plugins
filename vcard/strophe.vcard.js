@@ -35,6 +35,8 @@ Strophe.addConnectionPlugin('vcard', {
     init: function(conn) {
         this._connection = conn;
         Strophe.addNamespace('VCARD', 'vcard-temp');
+        Strophe.addNamespace('SEARCH', 'jabber:iq:search');
+        Strophe.addNamespace('DATA', 'jabber:x:data');
     },
     /****Function
       Retrieve a vCard for a JID/Entity
@@ -53,5 +55,32 @@ Strophe.addConnectionPlugin('vcard', {
     set: function(handler_cb, vCardEl, jid) {
         var iq = buildIq("set", this._connection.jid, jid, vCardEl);
         this._connection.sendIQ(iq.tree(), handler_cb, null);
+    },
+        /** Function: vcards
+    *
+    * Parameters:
+    *    (object) fields -  The fields to search on.
+    *    'user', 'fn', 'first', 'middle', 'last', 'nick', 'bday', 'ctry', 'locality', 'email', 'orgname', 'orgunit'
+    *    (Function) succes - Called on callback.
+    *    (Function) error - Called on error server response.
+    *
+    *  Returns:
+    *    Iq id
+     */
+
+    search: function (fields, vcardDir, success, error, timeout, iqid) {
+        var that = this._connection;
+        var _iqid = iqid ? iqid : that.getUniqueId("vcardSearch");
+
+        var iq = $iq({from:that.jid, to:vcardDir, type:'set', id:_iqid})
+          .c('query', {'xmlns': Strophe.NS.SEARCH})
+          .c('x', {'xmlns':Strophe.NS.DATA, type:'submit'});
+          for (var key in fields) {
+              if (fields.hasOwnProperty(key)) {
+                  var value = fields[key];
+                  iq.c('field', {'var':key}).c('value').t(value);
+              }
+          }
+        return that.sendIQ(iq.tree(), success, error, timeout);
     }
 });
