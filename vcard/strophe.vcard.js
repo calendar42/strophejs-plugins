@@ -12,22 +12,29 @@ Author: Nathan Zorn (nathan.zorn@gmail.com)
     Strophe, $build, $msg, $iq, $pres 
 */
 var buildIq = function(type, from, jid, vCardEl) {
-    var iq;
+    var iq, _jid,
+        _from = Strophe.getBareJidFromJid(from);
+        
     if (!jid)
     {
         //retrieve current jid's vCard
-        iq = $iq({type:type, from:from});
+        iq = $iq({type:type, from:_from});
     }
     else
     {
-        iq = $iq({type:type, to:jid, from:from});
+        _jid = Strophe.getBareJidFromJid(jid);
+        iq = $iq({type:type, to:_jid, from:_from});
     }
-    var ret = iq.c("vCard", {xmlns:Strophe.NS.VCARD});
+    // var ret = iq.c("vCard", {xmlns:Strophe.NS.VCARD});
     if (vCardEl)
     {
-        ret = ret.cnode(vCardEl);
+        iq = iq.cnode(vCardEl);
     }
-    return ret;
+    else
+    {
+        iq.c("vCard", {xmlns:Strophe.NS.VCARD});
+    }
+    return iq;
 };
 Strophe.addConnectionPlugin('vcard', {
     _connection: null,
@@ -45,16 +52,18 @@ Strophe.addConnectionPlugin('vcard', {
       (String) jid - optional - The name of the entity to request the vCard
          If no jid is given, this function retrieves the current user's vcard.
     */
-    get: function(handler_cb, jid) {
+    get: function(jid, success, error, timeout) {
+        var that = this._connection;
         var iq = buildIq("get", this._connection.jid, jid);
-        this._connection.sendIQ(iq.tree(), handler_cb, null);
+        return that.sendIQ(iq.tree(), success, error, timeout);
     },
     /*** Function
         Set an entity's vCard.
     */
-    set: function(handler_cb, vCardEl, jid) {
+    set: function(jid, vCardEl, success, error, timeout) {
+        var that = this._connection;
         var iq = buildIq("set", this._connection.jid, jid, vCardEl);
-        this._connection.sendIQ(iq.tree(), handler_cb, null);
+        that.sendIQ(iq.tree(), success, error, timeout);
     },
         /** Function: vcards
     *
@@ -73,14 +82,16 @@ Strophe.addConnectionPlugin('vcard', {
         var _iqid = iqid ? iqid : that.getUniqueId("vcardSearch");
 
         var iq = $iq({from:that.jid, to:vcardDir, type:'set', id:_iqid})
-          .c('query', {'xmlns': Strophe.NS.SEARCH})
-          .c('x', {'xmlns':Strophe.NS.DATA, type:'submit'});
-          for (var key in fields) {
-              if (fields.hasOwnProperty(key)) {
-                  var value = fields[key];
-                  iq.c('field', {'var':key}).c('value').t(value);
-              }
-          }
+            .c('query', {'xmlns': Strophe.NS.SEARCH})
+            .c('x', {'xmlns':Strophe.NS.DATA, type:'submit'});
+            for (var key in fields)
+            {
+                if (fields.hasOwnProperty(key))
+                {
+                    var value = fields[key];
+                      iq.c('field', {'var':key}).c('value').t(value);
+                }
+            }
         return that.sendIQ(iq.tree(), success, error, timeout);
     }
 });
