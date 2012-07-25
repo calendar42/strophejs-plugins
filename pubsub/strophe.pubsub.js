@@ -539,13 +539,22 @@ Extend connection object to have plugin name 'pubsub'.
      *  Returns:
      *    Iq id
      */
-    getNodeSubscriptions: function(node, success, error, timeout, iqid) {
+    getNodeSubscriptions: function(node, success, error, timeout, iqid, options) {
         var that = this._connection;
         var _iqid = iqid ? iqid : that.getUniqueId("pubsubsubscriptions");
 
         var iq = $iq({from:this.jid, to:this.service, type:'get', id:_iqid})
          .c('pubsub', {'xmlns':Strophe.NS.PUBSUB_OWNER})
-         .c('subscriptions', {'node':node});
+         .c('subscriptions', {'node':node}).up();
+
+         if (options) {
+          iq.c('set', {'xmlns': 'http://jabber.org/protocol/rsm' });
+          for (var key in options) {
+            if (options.hasOwnProperty(key)) {
+              iq.c(key).t(options[key]).up();
+            }
+          }
+         }
 
         return this._connection.sendIQ(iq.tree(), success, error, timeout);
     },
