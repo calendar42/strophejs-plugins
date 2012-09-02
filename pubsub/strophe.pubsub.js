@@ -552,7 +552,7 @@ Extend connection object to have plugin name 'pubsub'.
      */
 getNodeSubscriptions: function(node, success, error, timeout, iqid, options, rsm) {
         var that = this._connection;
-        var _iqid = iqid ? iqid : that.getUniqueId("pubsubsubscriptions");
+        var _iqid = iqid ? iqid : this.getUniqueId("pubsubsubscriptions");
 
         var iq = $iq({from:this.jid, to:this.service, type:'get', id:_iqid})
          .c('pubsub', {'xmlns':Strophe.NS.PUBSUB_OWNER});
