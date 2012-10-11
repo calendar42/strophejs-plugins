@@ -106,18 +106,20 @@ Extend connection object to have plugin name 'pubsub'.
     jid: null,
     
     _uniqueId: Math.round(Math.random() * 10000),
+    ps_suffix: '', // Make sure the ids are uniqe accross pubsubs
 
     getUniqueId: function (suffix)
     {
         if (typeof(suffix) == "string" || typeof(suffix) == "number") {
-            return ++this._uniqueId + ":pubsub:" + suffix;
+            return ++this._uniqueId + ":pubsub:" + suffix + ":" + this.ps_suffix;
         } else {
-            return ++this._uniqueId + ":pubsub";
+            return ++this._uniqueId + ":pubsub:"  + this.ps_suffix;
         }
     },
 
     //The plugin must have the init function.
     init: function(conn) {
+        this._uniqueId = Math.round(Math.random() * 10000);
         this._connection = conn;
 
         /*
@@ -184,6 +186,7 @@ Extend connection object to have plugin name 'pubsub'.
         }
         this.jid = jid || that.jid;
         this.service = service || null;
+        this.ps_suffix = MD5.hexdigest(this.service);
         this._autoService = false;
     },
 
@@ -479,14 +482,17 @@ Extend connection object to have plugin name 'pubsub'.
     *  Returns:
     *    Iq id
     */
-    items: function(node, success, error, timeout, iqid) {
+    items: function(node, success, error, timeout, iqid, max_items) {
         var that = this._connection;
         var _iqid = iqid ? iqid : this.getUniqueId("pubsubitems");
-
+        var itemsobj = { node: node };
+        if (max_items) {
+          itemsobj['max_items'] = max_items;
+        }
         //ask for all items
         var iq = $iq({from:this.jid, to:this.service, type:'get', id:_iqid})
           .c('pubsub', { xmlns:Strophe.NS.PUBSUB })
-          .c('items', {node:node});
+          .c('items', itemsobj);
 
         return this._connection.sendIQ(iq.tree(), success, error, timeout);
     },
