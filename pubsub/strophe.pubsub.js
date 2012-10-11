@@ -478,11 +478,12 @@ Extend connection object to have plugin name 'pubsub'.
     *    (Function) error - Called on error server response.
     *    (Number) timeout - Called on error server response.
     *    (String) iqid - Optional used as iq-id
+    *    (object) rsm - options for the result set management, like 'max' and 'index'
     *
     *  Returns:
     *    Iq id
     */
-    items: function(node, success, error, timeout, iqid, max_items) {
+    items: function(node, success, error, timeout, iqid, rsm, max_items) {
         var that = this._connection;
         var _iqid = iqid ? iqid : this.getUniqueId("pubsubitems");
         var itemsobj = { node: node };
@@ -492,7 +493,16 @@ Extend connection object to have plugin name 'pubsub'.
         //ask for all items
         var iq = $iq({from:this.jid, to:this.service, type:'get', id:_iqid})
           .c('pubsub', { xmlns:Strophe.NS.PUBSUB })
-          .c('items', itemsobj);
+          .c('items', itemsobj).up();
+
+        if (rsm) {
+          iq.c('set', {'xmlns': 'http://jabber.org/protocol/rsm' });
+          for (var key in rsm) {
+            if (rsm.hasOwnProperty(key)) {
+              iq.c(key).t(rsm[key]).up();
+            }
+          }
+         }
 
         return this._connection.sendIQ(iq.tree(), success, error, timeout);
     },
@@ -552,6 +562,8 @@ Extend connection object to have plugin name 'pubsub'.
      *    (Function) error - Called on error server response.
      *    (Number) timeout - Called on error server response.
      *    (String) iqid - Optional used as iq-id
+     *    (object) options
+     *    (object) rsm - options for the result set management, like 'max' and 'index'
      *
      *  Returns:
      *    Iq id
