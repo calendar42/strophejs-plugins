@@ -712,14 +712,19 @@ getNodeSubscriptions: function(node, success, error, timeout, iqid, options, rsm
      *  Returns:
      *    Iq id
      */
-    setAffiliation: function(node, jid, affiliation, success, error, timeout, iqid) {
+    setAffiliation: function(node, jid, affiliation, success, error, timeout, iqid, options) {
         var that = this._connection;
         var _iqid = iqid ? iqid : this.getUniqueId("pubsubaffiliations");
+        console.warn('oprionts', options)
+        options = options || {};
+        options['jid'] = jid;
+        options['affiliation'] = affiliation;
+
 
         var iq = $iq({from:this.jid, to:this.service, type:'set', id:_iqid})
           .c('pubsub', {'xmlns':Strophe.NS.PUBSUB_OWNER})
           .c('affiliations', {'node':node})
-          .c('affiliation', {'jid':jid, 'affiliation':affiliation});
+          .c('affiliation', options);
         return this._connection.sendIQ(iq.tree(), success, error, timeout);
     },
 
