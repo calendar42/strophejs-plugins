@@ -30,12 +30,13 @@ Strophe.addConnectionPlugin('geoloc', {
      *    (String) timestamp  - timestamp of when the location was requested
      *    (String) locality   - The jid you want to send the iq to.
      *    (String) country    - The jid you want to send the iq to.
+     *    (String) source     - Source of the geoloc
      *    (Function) success  - callback function for successful node creation.
      *    (Function) error    - error callback function.
      *    (Number) timeout    - Timeout in ms.
      *    (String) iqid         - Iq id.
 	 */
-	publishGeoloc: function(node, to, accuracy, lat, lon, timestamp, locality, country, success, error, timeout, iqid)
+	publishGeoloc: function(node, to, accuracy, lat, lon, timestamp, locality, country, source, success, error, timeout, iqid)
 	{
         var _iqid = iqid ? iqid : this._c.getUniqueId('publishgeoloc');
 		var iq = $iq({type: 'set', to: to, id: _iqid}).
@@ -60,6 +61,9 @@ Strophe.addConnectionPlugin('geoloc', {
         }
         if (country) {
             iq.c('country').t(country).up();
+        }
+        if (source) {
+            iq.c('source').t(source).up();
         }
         
 		return this._c.sendIQ(iq.tree(), success, error, timeout);
