@@ -728,6 +728,36 @@ getNodeSubscriptions: function(node, success, error, timeout, iqid, options, rsm
         return this._connection.sendIQ(iq.tree(), success, error, timeout);
     },
 
+    /**
+     *  http://xmpp.org/extensions/tmp/xep-0060-1.13.html
+     *  8.9.2 Modify Affiliation - 8.9.2.1 Request
+     *
+     * Parameters:
+     *    (String) node -  The name of the pubsub node.
+     *    (Array)  affiliations - list of objects containing: jid and affilition
+     *    (Function) success - Called on success server response.
+     *    (Function) error - Called on error server response.
+     *    (Number) timeout - Called on error server response.
+     *    (String) iqid - Optional used as iq-id
+     *
+     *  Returns:
+     *    Iq id
+     */
+    setAffiliations: function(node, affiliations, success, error, timeout, iqid) {
+        var that = this._connection;
+        var _iqid = iqid ? iqid : this.getUniqueId("pubsubaffiliations");
+
+        var iq = $iq({from:this.jid, to:this.service, type:'set', id:_iqid})
+          .c('pubsub', {'xmlns':Strophe.NS.PUBSUB_OWNER})
+          .c('affiliations', {'node':node});
+
+          for (var i = 0; i < affiliations.length; i++) {
+            iq.c('affiliation', affiliations[i]).up();
+         }
+
+        return this._connection.sendIQ(iq.tree(), success, error, timeout);
+    },
+
     /** Function: publishAtom
     *
     * Parameters:
